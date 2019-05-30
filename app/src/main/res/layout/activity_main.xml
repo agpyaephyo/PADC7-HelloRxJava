@@ -65,6 +65,14 @@
 			android:text="In Code Five"
 			android:layout_above="@id/btnInCodeFour"
 		/>
+		
+		<Button
+			android:id="@+id/btnInCodeSix"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="In Code Six"
+			android:layout_above="@id/btnInCodeFive"
+		/>
 	
 	</RelativeLayout>
 

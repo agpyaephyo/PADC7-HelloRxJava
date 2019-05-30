@@ -2,17 +2,22 @@ package com.padcmyanmar.rxjava.activities
 
 import android.os.Bundle
 import android.os.Handler
+import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu
 import android.view.MenuItem
 import com.padcmyanmar.rxjava.R
 import com.padcmyanmar.rxjava.RxJavaApp
+import com.padcmyanmar.rxjava.data.vo.RestaurantVO
 import com.padcmyanmar.rxjava.network.responses.RestaurantListResponse
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
+import io.reactivex.functions.Function
+import io.reactivex.functions.Predicate
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 
@@ -226,6 +231,49 @@ class MainActivity : AppCompatActivity() {
             })
 
         recursiveLogger(1)
+    }
+
+    private fun aBitComplexRxOperations() {
+        tvText.text = ""
+        val restaurantListResponseObservable = getRestaurantListResponseObservable()
+        restaurantListResponseObservable
+            .subscribeOn(Schedulers.io()) //run value creation code on a specific thread (non-UI thread)
+            .map<List<RestaurantVO>> { restaurantListResponse ->
+                restaurantListResponse.restaurantList
+            }
+            .flatMap<RestaurantVO>(object : Function<List<RestaurantVO>, ObservableSource<RestaurantVO>> {
+                override fun apply(restaurantVOs: List<RestaurantVO>): ObservableSource<RestaurantVO> {
+                    return Observable.fromIterable<RestaurantVO>(restaurantVOs)
+                }
+            })
+            .filter { restaurant ->
+                !TextUtils.isEmpty(restaurant.title)
+            }
+            .take(5)
+            .doOnNext { restaurantVO ->
+                Log.d(RxJavaApp.TAG, "Saving restaurant" + restaurantVO.title + " info into disk")
+            }
+            .map { restaurant ->
+                "Rx Api : \"" + restaurant.title + "\"" + " has " + restaurant.tagList.size + " special meals.\n"
+            }
+            .observeOn(AndroidSchedulers.mainThread()) //observe the emitted value of the Observable on an appropriate thread
+            .subscribe(object : Observer<String> {
+                override fun onSubscribe(@NonNull d: Disposable) {
+
+                }
+
+                override fun onNext(@NonNull readableText: String) {
+                    tvText.text = "${tvText.text} $readableText"
+                }
+
+                override fun onError(@NonNull e: Throwable) {
+
+                }
+
+                override fun onComplete() {
+
+                }
+            })
     }
 
     private fun getRestaurantListResponseObservable(): Observable<RestaurantListResponse> {
