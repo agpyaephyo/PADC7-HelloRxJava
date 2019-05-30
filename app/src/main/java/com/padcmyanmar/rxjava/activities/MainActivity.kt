@@ -1,15 +1,20 @@
-package com.padcmyanmar.rxjava
+package com.padcmyanmar.rxjava.activities
 
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu
 import android.view.MenuItem
+import com.padcmyanmar.rxjava.R
+import com.padcmyanmar.rxjava.RxJavaApp
+import com.padcmyanmar.rxjava.network.responses.RestaurantListResponse
 import io.reactivex.Observable
 import io.reactivex.Observer
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -21,8 +26,11 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         btnInCodeOne.setOnClickListener {
-            tvText.text = ""
             helloRxJava("the", "real", "PADC", ":", "Android", "Developer", "Course")
+        }
+
+        btnInCodeThree.setOnClickListener {
+            networkCallWithRxJava()
         }
     }
 
@@ -43,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun helloRxJava(vararg names: String) {
+        tvText.text = ""
         val nameObservable = Observable.fromArray(*names)
         nameObservable.subscribe(object : Observer<String> {
             override fun onSubscribe(@NonNull d: Disposable) {
@@ -50,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNext(@NonNull name: String) {
-                Log.d("Hello-RxJava", "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
+                Log.d(RxJavaApp.TAG, "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
                 tvText.text = "${tvText.text}\n Rx : \"$name\"  has ${name.length}  characters."
             }
 
@@ -70,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNext(@NonNull name: String) {
-                Log.d("Hello-RxJava", "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
+                Log.d(RxJavaApp.TAG, "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
                 tvText.text = "${tvText.text}\n Rx : \"$name\"  has ${name.length}  characters."
             }
 
@@ -109,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNext(@NonNull name: String) {
-                //Log.d("Hello-RxJava", "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
+                //Log.d(RxJavaApp.TAG, "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
                 tvText.text = "${tvText.text}\n Logging"
             }
 
@@ -125,5 +134,40 @@ class MainActivity : AppCompatActivity() {
         nameObservable.subscribe(nameObserver)
         nameObservable.subscribe(nameLogObserver)
         */
+    }
+
+    private fun networkCallWithRxJava() {
+        tvText.text = ""
+        val restaurantListResponseObservable = getRestaurantListResponseObservable()
+        restaurantListResponseObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<RestaurantListResponse> {
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(restaurantListResponse: RestaurantListResponse) {
+                    for (restaurant in restaurantListResponse.restaurantList) {
+                        tvText.text =
+                            "${tvText.text}\n Rx Api : \" ${restaurant.title} + \"  has  ${restaurant.tagList.size} special meals.\n"
+                    }
+                }
+
+                override fun onComplete() {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    tvText.text = "onError :  ${e.message}"
+                }
+
+            })
+    }
+
+    private fun getRestaurantListResponseObservable(): Observable<RestaurantListResponse> {
+        val rxJavaApp: RxJavaApp = application as RxJavaApp
+        return rxJavaApp.theApi.getRestaurantList()
     }
 }

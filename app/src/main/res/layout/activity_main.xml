@@ -5,7 +5,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".MainActivity">
+	tools:context=".activities.MainActivity">
 	
 	<com.google.android.material.appbar.AppBarLayout
 		android:layout_height="wrap_content"
@@ -40,6 +40,14 @@
 			android:layout_height="wrap_content"
 			android:text="In Code One"
 			android:layout_alignParentBottom="true"
+		/>
+		
+		<Button
+			android:id="@+id/btnInCodeThree"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="In Code Three"
+			android:layout_above="@id/btnInCodeOne"
 		/>
 	
 	</RelativeLayout>
