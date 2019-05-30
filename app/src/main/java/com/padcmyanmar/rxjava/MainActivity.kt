@@ -62,5 +62,68 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
+
+        /*
+        nameObservable.subscribe(object : Observer<String> {
+            override fun onSubscribe(@NonNull d: Disposable) {
+                tvText.text = "${tvText.text}\n onSubscribe"
+            }
+
+            override fun onNext(@NonNull name: String) {
+                Log.d("Hello-RxJava", "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
+                tvText.text = "${tvText.text}\n Rx : \"$name\"  has ${name.length}  characters."
+            }
+
+            override fun onError(@NonNull e: Throwable) {
+                tvText.text = "${tvText.text}\n onError ${e.message}"
+            }
+
+            override fun onComplete() {
+                tvText.text = "${tvText.text}\n onComplete"
+            }
+        })
+        */
+
+        /*
+        val nameObserver = object : Observer<String> {
+            override fun onSubscribe(@NonNull d: Disposable) {
+
+            }
+
+            override fun onNext(@NonNull name: String) {
+                tvText.text = "${tvText.text}\n Rx : \"$name\"  has ${name.length}  characters."
+            }
+
+            override fun onError(@NonNull e: Throwable) {
+
+            }
+
+            override fun onComplete() {
+
+            }
+        }
+
+        val nameLogObserver = object : Observer<String> {
+            override fun onSubscribe(@NonNull d: Disposable) {
+
+            }
+
+            override fun onNext(@NonNull name: String) {
+                //Log.d("Hello-RxJava", "Rx : \"" + name + "\"" + " has " + name.length + " characters.")
+                tvText.text = "${tvText.text}\n Logging"
+            }
+
+            override fun onError(@NonNull e: Throwable) {
+
+            }
+
+            override fun onComplete() {
+
+            }
+        }
+
+        nameObservable.subscribe(nameObserver)
+        nameObservable.subscribe(nameLogObserver)
+        */
     }
 }
