@@ -14,11 +14,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Callable
 
 class MainActivity : AppCompatActivity() {
+
+    private val mTestSubject: PublishSubject<Int> = PublishSubject.create()
+    private var mValue = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +39,36 @@ class MainActivity : AppCompatActivity() {
 
         btnInCodeFour.setOnClickListener {
             longRunningOperationWithRxJava()
+        }
+
+        mTestSubject.subscribe(object : Observer<Int> {
+            override fun onSubscribe(@NonNull d: Disposable) {
+
+            }
+
+            override fun onNext(integer: Int) {
+                when (integer) {
+                    1 -> tvText.text = "Yayyyy. We are one."
+                    2 -> tvText.text = "Hmmmm, two. Still acceptable though."
+                    3 -> tvText.text = "Ok people. WTF. We are dripping off. Three ?"
+                    4 -> tvText.text = "Listen up, unless we keep push up in next time, we are screwed."
+                    5 -> tvText.text = "We are screwed."
+                    else -> tvText.text = "We are officially irrelevant now."
+                }
+            }
+
+            override fun onComplete() {
+
+            }
+
+            override fun onError(@NonNull e: Throwable) {
+
+            }
+        })
+
+        btnInCodeFive.setOnClickListener {
+            mValue++
+            mTestSubject.onNext(mValue)
         }
     }
 
